@@ -9,11 +9,11 @@ environment:
     - nodejs_version: "5.12"
     - nodejs_version: "6.17"
     - nodejs_version: "7.10"
-    - nodejs_version: "8.16"
+    - nodejs_version: "8.17"
     - nodejs_version: "9.11"
-    - nodejs_version: "10.23"
+    - nodejs_version: "10.24"
     - nodejs_version: "11.15"
-    - nodejs_version: "12.18"
+    - nodejs_version: "12.22"
 cache:
   - node_modules
 install:
@@ -23,12 +23,16 @@ install:
       catch { Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) }
   # Configure npm
   - ps: |
-      # Skip updating shrinkwrap / lock
+      npm config set loglevel error
       npm config set shrinkwrap false
   # Remove all non-test dependencies
   - ps: |
       # Remove example dependencies
       npm rm --silent --save-dev connect-redis
+      # Remove lint dependencies
+      cmd.exe /c "node -pe `"Object.keys(require('./package').devDependencies).join('\n')`"" | `
+        sls "^eslint(-|$)" | `
+        %{ npm rm --silent --save-dev $_ }
   # Setup Node.js version-specific dependencies
   - ps: |
       # mocha for testing
@@ -71,6 +75,4 @@ test_script:
       npm --version
   # Run test script
   - npm run test-ci
-  # Run linting
-  - npm run lint
 version: "{build}"

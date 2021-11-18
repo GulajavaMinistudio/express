@@ -72,13 +72,13 @@ jobs:
           npm-i: mocha@7.2.0
 
         - name: Node.js 10.x
-          node-version: "10.23"
+          node-version: "10.24"
 
         - name: Node.js 11.x
           node-version: "11.15"
 
         - name: Node.js 12.x
-          node-version: "12.18"
+          node-version: "12.22"
 
     steps:
     - uses: actions/checkout@v2
@@ -90,7 +90,9 @@ jobs:
         dirname "$(nvm which ${{ matrix.node-version }})" >> "$GITHUB_PATH"
 
     - name: Configure npm
-      run: npm config set shrinkwrap false
+      run: |
+        npm config set loglevel error
+        npm config set shrinkwrap false
 
     - name: Install npm module(s) ${{ matrix.npm-i }}
       run: npm install --save-dev ${{ matrix.npm-i }}
@@ -98,6 +100,18 @@ jobs:
 
     - name: Remove non-test dependencies
       run: npm rm --silent --save-dev connect-redis
+
+    - name: Setup Node.js version-specific dependencies
+      shell: bash
+      run: |
+        # eslint for linting
+        # - remove on Node.js < 4
+        if [[ "$(cut -d. -f1 <<< "${{ matrix.node-version }}")" -lt 4 ]]; then
+          node -pe 'Object.keys(require("./package").devDependencies).join("\n")' | \
+            grep -E '^eslint(-|$)' | \
+            sort -r | \
+            xargs -n1 npm rm --silent --save-dev
+        fi
 
     - name: Install Node.js dependencies
       run: npm install
@@ -115,6 +129,7 @@ jobs:
       run: npm run test-ci
 
     - name: Lint code
+      if: steps.list_env.outputs.eslint != ''
       run: npm run lint
 
     - name: Collect code coverage
