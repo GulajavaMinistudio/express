@@ -10,7 +10,7 @@ describe('app', function(){
       , app = express();
 
     blog.on('mount', function(arg){
-      arg.should.equal(app);
+      assert.strictEqual(arg, app)
       done();
     });
 
@@ -37,6 +37,7 @@ describe('app', function(){
       var blog = express()
         , forum = express()
         , app = express();
+      var cb = after(2, done)
 
       blog.get('/', function(req, res){
         res.end('blog');
@@ -50,12 +51,12 @@ describe('app', function(){
       app.use('/forum', forum);
 
       request(app)
-      .get('/blog')
-      .expect('blog', function(){
-        request(app)
+        .get('/blog')
+        .expect(200, 'blog', cb)
+
+      request(app)
         .get('/forum')
-        .expect('forum', done);
-      });
+        .expect(200, 'forum', done)
     })
 
     it('should set the child\'s .parent', function(){
@@ -63,7 +64,7 @@ describe('app', function(){
         , app = express();
 
       app.use('/blog', blog);
-      blog.parent.should.equal(app);
+      assert.strictEqual(blog.parent, app)
     })
 
     it('should support dynamic routes', function(done){
@@ -102,11 +103,11 @@ describe('app', function(){
       });
 
       blog.once('mount', function (parent) {
-        parent.should.equal(app);
+        assert.strictEqual(parent, app)
         cb();
       });
       other.once('mount', function (parent) {
-        parent.should.equal(app);
+        assert.strictEqual(parent, app)
         cb();
       });
 
