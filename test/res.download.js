@@ -1,3 +1,4 @@
+'use strict'
 
 var after = require('after');
 var assert = require('assert');
@@ -88,7 +89,7 @@ describe('res', function(){
       var cb = after(2, done);
 
       app.use(function(req, res){
-        res.download('test/fixtures/user.html', 'document', done);
+        res.download('test/fixtures/user.html', 'document', cb)
       });
 
       request(app)

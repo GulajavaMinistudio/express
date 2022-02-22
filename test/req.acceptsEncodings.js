@@ -1,3 +1,4 @@
+'use strict'
 
 var express = require('../')
   , request = require('supertest');
@@ -9,8 +10,8 @@ describe('req', function(){
 
       app.get('/', function (req, res) {
         res.send({
-          gzip: req.acceptsEncoding('gzip'),
-          deflate: req.acceptsEncoding('deflate')
+          gzip: req.acceptsEncodings('gzip'),
+          deflate: req.acceptsEncodings('deflate')
         })
       })
 
@@ -25,7 +26,7 @@ describe('req', function(){
 
       app.get('/', function (req, res) {
         res.send({
-          bogus: req.acceptsEncoding('bogus')
+          bogus: req.acceptsEncodings('bogus')
         })
       })
 

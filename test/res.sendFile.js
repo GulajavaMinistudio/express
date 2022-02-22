@@ -1,3 +1,4 @@
+'use strict'
 
 var after = require('after');
 var Buffer = require('safe-buffer').Buffer
@@ -6,7 +7,6 @@ var express = require('../')
   , assert = require('assert');
 var onFinished = require('on-finished');
 var path = require('path');
-var should = require('should');
 var fixtures = path.join(__dirname, 'fixtures');
 var utils = require('./support/utils');
 
@@ -112,12 +112,11 @@ describe('res', function(){
       app.use(function (req, res) {
         setImmediate(function () {
           res.sendFile(path.resolve(fixtures, 'name.txt'));
-          server.close(cb)
           setTimeout(function () {
             cb(error)
           }, 10)
         })
-        test.abort();
+        test.req.abort()
       });
 
       app.use(function (err, req, res, next) {
@@ -127,7 +126,10 @@ describe('res', function(){
 
       var server = app.listen()
       var test = request(server).get('/')
-      test.end()
+      test.end(function (err) {
+        assert.ok(err)
+        server.close(cb)
+      })
     })
 
     describe('with "cacheControl" option', function () {
@@ -272,43 +274,49 @@ describe('res', function(){
     })
 
     it('should invoke the callback when client aborts', function (done) {
-      var cb = after(1, done);
+      var cb = after(2, done)
       var app = express();
 
       app.use(function (req, res) {
         setImmediate(function () {
           res.sendFile(path.resolve(fixtures, 'name.txt'), function (err) {
-            should(err).be.ok()
-            err.code.should.equal('ECONNABORTED');
-            server.close(cb)
+            assert.ok(err)
+            assert.strictEqual(err.code, 'ECONNABORTED')
+            cb()
           });
         });
-        test.abort();
+        test.req.abort()
       });
 
       var server = app.listen()
       var test = request(server).get('/')
-      test.expect(200, cb);
+      test.end(function (err) {
+        assert.ok(err)
+        server.close(cb)
+      })
     })
 
     it('should invoke the callback when client already aborted', function (done) {
-      var cb = after(1, done);
+      var cb = after(2, done)
       var app = express();
 
       app.use(function (req, res) {
         onFinished(res, function () {
           res.sendFile(path.resolve(fixtures, 'name.txt'), function (err) {
-            should(err).be.ok()
-            err.code.should.equal('ECONNABORTED');
-            server.close(cb)
+            assert.ok(err)
+            assert.strictEqual(err.code, 'ECONNABORTED')
+            cb()
           });
         });
-        test.abort();
+        test.req.abort()
       });
 
       var server = app.listen()
       var test = request(server).get('/')
-      test.expect(200, cb);
+      test.end(function (err) {
+        assert.ok(err)
+        server.close(cb)
+      })
     })
 
     it('should invoke the callback without error when HEAD', function (done) {
@@ -350,15 +358,13 @@ describe('res', function(){
 
       app.use(function (req, res) {
         res.sendFile(path.resolve(fixtures, 'does-not-exist'), function (err) {
-          should(err).be.ok()
-          err.status.should.equal(404);
-          res.send('got it');
+          res.send(err ? 'got ' + err.status + ' error' : 'no error')
         });
       });
 
       request(app)
-      .get('/')
-      .expect(200, 'got it', done);
+        .get('/')
+        .expect(200, 'got 404 error', done)
     })
   })
 
@@ -398,43 +404,49 @@ describe('res', function(){
     })
 
     it('should invoke the callback when client aborts', function (done) {
-      var cb = after(1, done);
+      var cb = after(2, done)
       var app = express();
 
       app.use(function (req, res) {
         setImmediate(function () {
           res.sendfile('test/fixtures/name.txt', function (err) {
-            should(err).be.ok()
-            err.code.should.equal('ECONNABORTED');
-            server.close(cb)
+            assert.ok(err)
+            assert.strictEqual(err.code, 'ECONNABORTED')
+            cb()
           });
         });
-        test.abort();
+        test.req.abort()
       });
 
       var server = app.listen()
       var test = request(server).get('/')
-      test.expect(200, cb);
+      test.end(function (err) {
+        assert.ok(err)
+        server.close(cb)
+      })
     })
 
     it('should invoke the callback when client already aborted', function (done) {
-      var cb = after(1, done);
+      var cb = after(2, done)
       var app = express();
 
       app.use(function (req, res) {
         onFinished(res, function () {
           res.sendfile('test/fixtures/name.txt', function (err) {
-            should(err).be.ok()
-            err.code.should.equal('ECONNABORTED');
-            server.close(cb)
+            assert.ok(err)
+            assert.strictEqual(err.code, 'ECONNABORTED')
+            cb()
           });
         });
-        test.abort();
+        test.req.abort()
       });
 
       var server = app.listen()
       var test = request(server).get('/')
-      test.expect(200, cb);
+      test.end(function (err) {
+        assert.ok(err)
+        server.close(cb)
+      })
     })
 
     it('should invoke the callback without error when HEAD', function (done) {
@@ -524,7 +536,7 @@ describe('res', function(){
       app.use(function(req, res){
         res.sendfile('test/fixtures/user.html', function(err){
           assert(!res.headersSent);
-          req.socket.listeners('error').should.have.length(1); // node's original handler
+          assert.strictEqual(req.socket.listeners('error').length, 1) // node's original handler
           done();
         });
 
@@ -652,12 +664,11 @@ describe('res', function(){
       app.use(function (req, res) {
         setImmediate(function () {
           res.sendfile(path.resolve(fixtures, 'name.txt'));
-          server.close(cb)
           setTimeout(function () {
             cb(error)
           }, 10)
         });
-        test.abort();
+        test.req.abort()
       });
 
       app.use(function (err, req, res, next) {
@@ -667,7 +678,10 @@ describe('res', function(){
 
       var server = app.listen()
       var test = request(server).get('/')
-      test.end()
+      test.end(function (err) {
+        assert.ok(err)
+        server.close(cb)
+      })
     })
 
     describe('with an absolute path', function(){
@@ -766,12 +780,12 @@ describe('res', function(){
         });
 
         request(app)
-        .get('/')
-        .end(function(err, res){
-          res.statusCode.should.equal(404);
-          calls.should.equal(1);
-          done();
-        });
+          .get('/')
+          .expect(404, function (err) {
+            if (err) return done(err)
+            assert.strictEqual(calls, 1)
+            done()
+          })
       })
 
       describe('with non-GET', function(){

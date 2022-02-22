@@ -1,7 +1,7 @@
+'use strict'
 
 var assert = require('assert');
 var Buffer = require('safe-buffer').Buffer
-var should = require('should')
 var utils = require('../lib/utils');
 
 describe('utils.etag(body, encoding)', function(){
@@ -90,7 +90,14 @@ describe('utils.isAbsolute()', function(){
 describe('utils.flatten(arr)', function(){
   it('should flatten an array', function(){
     var arr = ['one', ['two', ['three', 'four'], 'five']];
-    should(utils.flatten(arr))
-      .eql(['one', 'two', 'three', 'four', 'five'])
+    var flat = utils.flatten(arr)
+
+    assert.strictEqual(flat.length, 5)
+    assert.strictEqual(flat[0], 'one')
+    assert.strictEqual(flat[1], 'two')
+    assert.strictEqual(flat[2], 'three')
+    assert.strictEqual(flat[3], 'four')
+    assert.strictEqual(flat[4], 'five')
+    assert.ok(flat.every(function (v) { return typeof v === 'string' }))
   })
 })
