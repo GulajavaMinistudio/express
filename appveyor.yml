@@ -16,13 +16,17 @@ environment:
     - nodejs_version: "12.22"
     - nodejs_version: "13.14"
     - nodejs_version: "14.19"
+    - nodejs_version: "15.14"
+    - nodejs_version: "16.14"
+    - nodejs_version: "17.9"
+    - nodejs_version: "18.0"
 cache:
   - node_modules
 install:
   # Install Node.js
   - ps: >-
       try { Install-Product node $env:nodejs_version -ErrorAction Stop }
-      catch { Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) }
+      catch { Update-NodeJsInstallation (Get-NodeJsLatestBuild $env:nodejs_version) x64 }
   # Configure npm
   - ps: |
       npm config set loglevel error
@@ -69,11 +73,11 @@ install:
   - ps: |
       # supertest for http calls
       # - use 2.0.0 for Node.js < 4
-      # - use 3.4.2 for Node.js < 6
+      # - use 3.4.2 for Node.js < 7
       # - use 6.1.6 for Node.js < 8
       if ([int]$env:nodejs_version.split(".")[0] -lt 4) {
         npm install --silent --save-dev supertest@2.0.0
-      } elseif ([int]$env:nodejs_version.split(".")[0] -lt 6) {
+      } elseif ([int]$env:nodejs_version.split(".")[0] -lt 7) {
         npm install --silent --save-dev supertest@3.4.2
       } elseif ([int]$env:nodejs_version.split(".")[0] -lt 8) {
         npm install --silent --save-dev supertest@6.1.6
