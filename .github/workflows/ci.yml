@@ -87,24 +87,26 @@ jobs:
 
         - name: Node.js 12.x
           node-version: "12.22"
+          npm-i: mocha@9.2.2
 
         - name: Node.js 13.x
           node-version: "13.14"
+          npm-i: mocha@9.2.2
 
         - name: Node.js 14.x
-          node-version: "14.19"
+          node-version: "14.20"
 
         - name: Node.js 15.x
           node-version: "15.14"
 
         - name: Node.js 16.x
-          node-version: "16.14"
+          node-version: "16.17"
 
         - name: Node.js 17.x
           node-version: "17.9"
 
         - name: Node.js 18.x
-          node-version: "18.0"
+          node-version: "18.10"
 
     steps:
     - uses: actions/checkout@v2
@@ -131,8 +133,8 @@ jobs:
       shell: bash
       run: |
         # eslint for linting
-        # - remove on Node.js < 10
-        if [[ "$(cut -d. -f1 <<< "${{ matrix.node-version }}")" -lt 10 ]]; then
+        # - remove on Node.js < 12
+        if [[ "$(cut -d. -f1 <<< "${{ matrix.node-version }}")" -lt 12 ]]; then
           node -pe 'Object.keys(require("./package").devDependencies).join("\n")' | \
             grep -E '^eslint(-|$)' | \
             sort -r | \
