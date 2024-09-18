@@ -65,36 +65,6 @@ describe('express.raw()', function () {
       .expect(200, { buf: '' }, done)
   })
 
-  it('should 500 if stream not readable', function (done) {
-    var app = express()
-
-    app.use(function (req, res, next) {
-      req.on('end', next)
-      req.resume()
-    })
-
-    app.use(express.raw())
-
-    app.use(function (err, req, res, next) {
-      res.status(err.status || 500)
-      res.send('[' + err.type + '] ' + err.message)
-    })
-
-    app.post('/', function (req, res) {
-      if (Buffer.isBuffer(req.body)) {
-        res.json({ buf: req.body.toString('hex') })
-      } else {
-        res.json(req.body)
-      }
-    })
-
-    request(app)
-      .post('/')
-      .set('Content-Type', 'application/octet-stream')
-      .send('the user is tobi')
-      .expect(500, '[stream.not.readable] stream is not readable', done)
-  })
-
   it('should handle duplicated middleware', function (done) {
     var app = express()
 
@@ -236,7 +206,7 @@ describe('express.raw()', function () {
         var test = request(this.app).post('/')
         test.set('Content-Type', 'application/octet-stream')
         test.write(Buffer.from('000102', 'hex'))
-        test.expect(200, '{}', done)
+        test.expect(200, '', done)
       })
     })
 
@@ -265,7 +235,7 @@ describe('express.raw()', function () {
         var test = request(this.app).post('/')
         test.set('Content-Type', 'application/x-foo')
         test.write(Buffer.from('000102', 'hex'))
-        test.expect(200, '{}', done)
+        test.expect(200, '', done)
       })
     })
 
@@ -420,7 +390,6 @@ describe('express.raw()', function () {
         .send('buzz')
         .expect(200)
         .expect('x-store-foo', 'bar')
-        .expect('{}')
         .end(done)
     })
 

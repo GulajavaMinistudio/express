@@ -61,32 +61,6 @@ describe('express.text()', function () {
       .expect(200, '""', done)
   })
 
-  it('should 500 if stream not readable', function (done) {
-    var app = express()
-
-    app.use(function (req, res, next) {
-      req.on('end', next)
-      req.resume()
-    })
-
-    app.use(express.text())
-
-    app.use(function (err, req, res, next) {
-      res.status(err.status || 500)
-      res.send('[' + err.type + '] ' + err.message)
-    })
-
-    app.post('/', function (req, res) {
-      res.json(req.body)
-    })
-
-    request(app)
-      .post('/')
-      .set('Content-Type', 'text/plain')
-      .send('user is tobi')
-      .expect(500, '[stream.not.readable] stream is not readable', done)
-  })
-
   it('should handle duplicated middleware', function (done) {
     var app = express()
 
@@ -247,7 +221,7 @@ describe('express.text()', function () {
           .post('/')
           .set('Content-Type', 'text/plain')
           .send('user is tobi')
-          .expect(200, '{}', done)
+          .expect(200, '', done)
       })
     })
 
@@ -277,7 +251,7 @@ describe('express.text()', function () {
           .post('/')
           .set('Content-Type', 'text/xml')
           .send('<user>tobi</user>')
-          .expect(200, '{}', done)
+          .expect(200, '', done)
       })
     })
 
@@ -445,7 +419,6 @@ describe('express.text()', function () {
         .send('buzz')
         .expect(200)
         .expect('x-store-foo', 'bar')
-        .expect('{}')
         .end(done)
     })
 

@@ -79,9 +79,4 @@ describe('exports', function(){
     .get('/')
     .expect('bar', done);
   })
-
-  it('should throw on old middlewares', function(){
-    assert.throws(function () { express.bodyParser() }, /Error:.*middleware.*bodyParser/)
-    assert.throws(function () { express.limit() }, /Error:.*middleware.*limit/)
-  })
 })

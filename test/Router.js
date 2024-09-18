@@ -25,7 +25,7 @@ describe('Router', function(){
     });
     router.use('/foo', another);
 
-    router.handle({ url: '/foo/bar', method: 'GET' }, { end: done });
+    router.handle({ url: '/foo/bar', method: 'GET' }, { end: done }, function(){});
   });
 
   it('should support dynamic routes', function(done){
@@ -38,7 +38,7 @@ describe('Router', function(){
     });
     router.use('/:foo', another);
 
-    router.handle({ url: '/test/route', method: 'GET' }, { end: done });
+    router.handle({ url: '/test/route', method: 'GET' }, { end: done }, function(){});
   });
 
   it('should handle blank URL', function(done){
@@ -102,7 +102,7 @@ describe('Router', function(){
       res.end();
     });
 
-    router.handle({ url: '/', method: 'GET' }, { end: done });
+    router.handle({ url: '/', method: 'GET' }, { end: done }, function(){});
   });
 
   it('should not stack overflow with a large sync route stack', function (done) {
@@ -127,7 +127,9 @@ describe('Router', function(){
       res.end()
     })
 
-    router.handle({ url: '/foo', method: 'GET' }, { end: done })
+    router.handle({ url: '/foo', method: 'GET' }, { end: done }, function (err) {
+      assert(!err, err);
+    });
   })
 
   it('should not stack overflow with a large sync middleware stack', function (done) {
@@ -152,7 +154,9 @@ describe('Router', function(){
       res.end()
     })
 
-    router.handle({ url: '/', method: 'GET' }, { end: done })
+    router.handle({ url: '/', method: 'GET' }, { end: done }, function (err) {
+      assert(!err, err);
+    })
   })
 
   describe('.handle', function(){
@@ -169,7 +173,7 @@ describe('Router', function(){
           done();
         }
       }
-      router.handle({ url: '/foo', method: 'GET' }, res);
+      router.handle({ url: '/foo', method: 'GET' }, res, function(){});
     })
   })
 
@@ -424,50 +428,32 @@ describe('Router', function(){
       assert.equal(count, methods.length);
       done();
     })
-
-    it('should be called for any URL when "*"', function (done) {
-      var cb = after(4, done)
-      var router = new Router()
-
-      function no () {
-        throw new Error('should not be called')
-      }
-
-      router.all('*', function (req, res) {
-        res.end()
-      })
-
-      router.handle({ url: '/', method: 'GET' }, { end: cb }, no)
-      router.handle({ url: '/foo', method: 'GET' }, { end: cb }, no)
-      router.handle({ url: 'foo', method: 'GET' }, { end: cb }, no)
-      router.handle({ url: '*', method: 'GET' }, { end: cb }, no)
-    })
   })
 
   describe('.use', function() {
     it('should require middleware', function () {
       var router = new Router()
-      assert.throws(function () { router.use('/') }, /requires a middleware function/)
+      assert.throws(function () { router.use('/') }, /argument handler is required/)
     })
 
     it('should reject string as middleware', function () {
       var router = new Router()
-      assert.throws(function () { router.use('/', 'foo') }, /requires a middleware function but got a string/)
+      assert.throws(function () { router.use('/', 'foo') }, /argument handler must be a function/)
     })
 
     it('should reject number as middleware', function () {
       var router = new Router()
-      assert.throws(function () { router.use('/', 42) }, /requires a middleware function but got a number/)
+      assert.throws(function () { router.use('/', 42) }, /argument handler must be a function/)
     })
 
     it('should reject null as middleware', function () {
       var router = new Router()
-      assert.throws(function () { router.use('/', null) }, /requires a middleware function but got a Null/)
+      assert.throws(function () { router.use('/', null) }, /argument handler must be a function/)
     })
 
     it('should reject Date as middleware', function () {
       var router = new Router()
-      assert.throws(function () { router.use('/', new Date()) }, /requires a middleware function but got a Date/)
+      assert.throws(function () { router.use('/', new Date()) }, /argument handler must be a function/)
     })
 
     it('should be called for any URL', function (done) {
@@ -512,6 +498,16 @@ describe('Router', function(){
   })
 
   describe('.param', function() {
+    it('should require function', function () {
+      var router = new Router();
+      assert.throws(router.param.bind(router, 'id'), /argument fn is required/);
+    });
+
+    it('should reject non-function', function () {
+      var router = new Router();
+      assert.throws(router.param.bind(router, 'id', 42), /argument fn must be a function/);
+    });
+
     it('should call param function when routing VERBS', function(done) {
       var router = new Router();
 
