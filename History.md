@@ -1,7 +1,14 @@
 unreleased
 ========================
 
+* Remove `utils-merge` dependency - use spread syntax instead
 * Remove `Object.setPrototypeOf` polyfill
+* cleanup: remove AsyncLocalStorage check from tests
+* cleanup: remove unnecessary require for global Buffer
+* perf: use loop for acceptParams
+* Replace `methods` dependency with standard library
+* refactor: prefix built-in node module imports
+* Remove unused `depd` dependency
 
 5.0.1 / 2024-10-08
 ==========

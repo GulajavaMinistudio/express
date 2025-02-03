@@ -1,9 +1,8 @@
 'use strict'
 
-var assert = require('assert')
-var Buffer = require('node:buffer').Buffer
+var assert = require('node:assert')
 var express = require('..')
-var path = require('path')
+var path = require('node:path')
 var request = require('supertest')
 var utils = require('./support/utils')
 

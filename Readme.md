@@ -20,7 +20,6 @@
 
 
 [![NPM Version][npm-version-image]][npm-url]
-[![NPM Install Size][npm-install-size-image]][npm-install-size-url]
 [![NPM Downloads][npm-downloads-image]][npm-downloads-url]
 [![OpenSSF Scorecard Badge][ossf-scorecard-badge]][ossf-scorecard-visualizer]
 
@@ -210,7 +209,9 @@ The original author of Express is [TJ Holowaychuk](https://github.com/tj)
 * [dakshkhetan](https://github.com/dakshkhetan) - **Daksh Khetan** (he/him)
 * [lucasraziel](https://github.com/lucasraziel) - **Lucas Soares Do Rego**
 * [IamLizu](https://github.com/IamLizu) - **S M Mahmudul Hasan** (he/him)
+* [Phillip9587](https://github.com/Phillip9587) - **Phillip Barta**
 * [Sushmeet](https://github.com/Sushmeet) - **Sushmeet Sunger**
+* [rxmarbles](https://github.com/rxmarbles) **Rick Markins** (He/him)
 
 <details>
 <summary>Triagers emeriti members</summary>
@@ -256,8 +257,6 @@ The original author of Express is [TJ Holowaychuk](https://github.com/tj)
 [github-actions-ci-url]: https://github.com/expressjs/express/actions/workflows/ci.yml
 [npm-downloads-image]: https://badgen.net/npm/dm/express
 [npm-downloads-url]: https://npmcharts.com/compare/express?minimal=true
-[npm-install-size-image]: https://badgen.net/packagephobia/install/express
-[npm-install-size-url]: https://packagephobia.com/result?p=express
 [npm-url]: https://npmjs.org/package/express
 [npm-version-image]: https://badgen.net/npm/v/express
 [ossf-scorecard-badge]: https://api.scorecard.dev/projects/github.com/expressjs/express/badge
